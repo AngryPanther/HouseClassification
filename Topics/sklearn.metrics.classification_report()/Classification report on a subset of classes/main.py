@@ -1,0 +1,5 @@
+from sklearn.metrics import classification_report
+
+
+def solution(true_labels, predicted_labels):
+    print(classification_report(true_labels, predicted_labels, labels=['apple', 'banana']))

@@ -1,0 +1,326 @@
+<div class="step-text">
+<p>A classification report is a crucial tool for evaluating the performance of machine learning models. In this topic, we will explore the functionality of the classification report and learn how to analyze the report's output.</p>
+<h5 id="the-initial-setup">The initial setup</h5>
+<p>To understand the result of <code class="language-python">classification_report()</code> function, we will use an example of a grocery store. In this store, we have an installed computer vision camera that classifies all of the products as dairy, fruits, vegetables, and meat. The results of this classification are as below: </p>
+<pre><code class="language-python">import pandas as pd
+
+true_labels_food = [
+    "dairy",
+    "fruits",
+    "vegetables",
+    "dairy",
+    "meat",
+    "meat",
+    "vegetables",
+    "fruits",
+    "fruits",
+    "meat",
+]
+pred_labels_food = [
+    "fruits",
+    "fruits",
+    "dairy",
+    "dairy",
+    "fruits",
+    "meat",
+    "vegetables",
+    "dairy",
+    "fruits",
+    "meat",
+]
+
+df = pd.DataFrame(
+    {"True Labels": true_labels_food, "Predicted Labels": pred_labels_food}
+)
+</code></pre>
+<pre><code class="language-no-highlight">+----+---------------+--------------------+
+|    | True Labels   | Predicted Labels   |
+|----+---------------+--------------------|
+|  0 | dairy         | fruits             |
+|  1 | fruits        | fruits             |
+|  2 | vegetables    | dairy              |
+|  3 | dairy         | dairy              |
+|  4 | meat          | fruits             |
+|  5 | meat          | meat               |
+|  6 | vegetables    | vegetables         |
+|  7 | fruits        | dairy              |
+|  8 | fruits        | fruits             |
+|  9 | meat          | meat               |
++----+---------------+--------------------+
+</code></pre>
+<p>To get the results of this classification model we import <code class="language-python">classification_report()</code> function from <code class="language-python">sklearn.metrics</code> and give as input true labels and predicted values. </p>
+<pre><code class="language-python">from sklearn.metrics import classification_report
+
+print(classification_report(df['True Labels'], df['Predicted Labels']))</code></pre>
+<pre><code class="language-sql">              precision    recall  f1-score   support
+
+       dairy       0.33      0.50      0.40         2
+      fruits       0.50      0.67      0.57         3
+        meat       1.00      0.67      0.80         3
+  vegetables       1.00      0.50      0.67         2
+
+    accuracy                           0.60        10
+   macro avg       0.71      0.58      0.61        10
+weighted avg       0.72      0.60      0.62        10</code></pre>
+<h5 id="use-cases-for-binary-multilabel-and-multiclass-classification">Use cases for binary, multilabel, and multiclass classification</h5>
+<p>In the example above we have 4 classes, this case is a multiclass classification. However, we can also use <code class="language-python">classififcation_report()</code>  for multilabel and binary classification tasks. Let's first remember what is binary, multilabel, and multiclass classification. </p>
+<ul>
+<li>
+<p>Binary classification: there are only two classes to predict. For instance, 'meat' and 'fruits' classes.</p>
+<pre><code class="language-python">true_labels_food = ['meat', 'fruits', 'fruits', 'meat', 'fruits', 'meat', 'fruits', 'fruits', 'meat']
+pred_labels_food = ['fruits', 'fruits', 'meat', 'meat', 'meat', 'meat', 'meat', 'fruits', 'meat']
+
+df = pd.DataFrame({
+    'True Labels': true_labels_food ,
+    'Predicted Labels': pred_labels_food
+})
+
+print(classification_report(df['True Labels'], df['Predicted Labels']))</code></pre>
+<pre><code class="language-sql">              precision    recall  f1-score   support
+
+      fruits       0.67      0.40      0.50         5
+        meat       0.50      0.75      0.60         4
+
+    accuracy                           0.56         9
+   macro avg       0.58      0.57      0.55         9
+weighted avg       0.59      0.56      0.54         9</code></pre>
+</li>
+<li>
+<p>Multilabel classification: each instance can be assigned to multiple classes. For example, one salad can be considered as meat and vegetables. </p>
+<pre><code class="language-python">df = pd.DataFrame(
+    {
+        "True": [
+            [1, 0, 1, 0],
+            [0, 1, 1, 0],
+            [1, 0, 0, 1],
+            [0, 1, 0, 1],
+            [0, 1, 1, 0],
+            [1, 1, 0, 0],
+            [0, 0, 1, 1],
+            [1, 0, 1, 0],
+            [1, 0, 0, 1],
+            [0, 1, 0, 1],
+        ],
+        "Predicted": [
+            [1, 0, 1, 0],
+            [0, 1, 0, 1],
+            [1, 1, 0, 0],
+            [0, 1, 0, 1],
+            [0, 1, 1, 0],
+            [1, 0, 1, 0],
+            [0, 1, 1, 0],
+            [1, 0, 0, 1],
+            [1, 0, 1, 0],
+            [0, 0, 1, 1],
+        ],
+    }
+)</code></pre>
+<pre><code class="language-no-highlight">              precision    recall  f1-score   support
+
+      fruits       1.00      1.00      1.00         5
+  vegetables       0.60      0.60      0.60         5
+       dairy       0.50      0.60      0.55         5
+        meat       0.50      0.40      0.44         5
+
+   micro avg       0.65      0.65      0.65        20
+   macro avg       0.65      0.65      0.65        20
+weighted avg       0.65      0.65      0.65        20
+ samples avg       0.65      0.65      0.65        20</code></pre>
+</li>
+<li>
+<p>Multiclass classification: there are more than two mutually exclusive classes to predict. For instance, one product can be only meat, dairy, or fruit. An example of multiclass classification was shown in the introduction. </p>
+</li>
+</ul>
+<h5 id="support-values-labels-and-target-names-parameters-in-the-report">Support values, labels, and target names parameters in the report</h5>
+<p>In the classification report, you can see metrics for each class. Notice, that for each class there are the results for three metrics: precision, recall, and f1-score. In the last column, you can see the support value. </p>
+<ul>
+<li>
+<p><code class="language-python">support</code> - the value in the classification report that refers to the number of occurrences of each class in the true labels. Let's take the new classification results of our model. </p>
+<pre><code class="language-python">true_labels_food = [
+    "dairy",
+    "fruits",
+    "dairy",
+    "dairy",
+    "meat",
+    "dairy",
+    "dairy",
+    "meat",
+    "fruits",
+    "meat",
+]
+pred_labels_food = [
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "dairy",
+    "meat",
+]
+
+df = pd.DataFrame(
+    {"True Labels": true_labels_food, "Predicted Labels": pred_labels_food}
+)</code></pre>
+<pre><code class="language-no-highlight">+----+---------------+--------------------+
+|    | True Labels   | Predicted Labels   |
+|----+---------------+--------------------|
+|  0 | dairy         | dairy              |
+|  1 | fruits        | dairy              |
+|  2 | dairy         | dairy              |
+|  3 | dairy         | dairy              |
+|  4 | meat          | dairy              |
+|  5 | dairy         | dairy              |
+|  6 | dairy         | dairy              |
+|  7 | meat          | dairy              |
+|  8 | fruits        | dairy              |
+|  9 | meat          | meat               |
++----+---------------+--------------------+</code></pre>
+<p>You can see that there are 9 dairy predicted items and 5 true dairy products. When we get the classification report, we will see the support parameter of dairy items = 5, not 9 as the support parameter shows the true labels of the model. Therefore, it is important to pass true and predicted values in the right order. </p>
+<pre><code class="language-sql">              precision    recall  f1-score   support
+
+       dairy       0.56      1.00      0.71         5
+      fruits       0.00      0.00      0.00         2
+        meat       1.00      0.33      0.50         3
+
+    accuracy                           0.60        10
+   macro avg       0.52      0.44      0.40        10
+weighted avg       0.58      0.60      0.51        10</code></pre>
+</li>
+</ul>
+<p>In this example, we can see that the model has not predicted fruits at all. If we want to see the classification report of the model without this class, we can use a <code class="language-python">labels</code> parameter.</p>
+<ul>
+<li>
+<p><code class="language-python">labels</code> parameter specifies which classes to include in the report. By default, the report will display results for all unique labels present in the true and predicted labels. For example, if we pass only <code class="language-python">labels=['dairy', 'meat']</code> and get the classification report of only these labels. </p>
+<pre><code class="language-python">print(classification_report(df['True Labels'], df['Predicted Labels'], labels=['dairy', 'meat']))</code></pre>
+<pre><code class="language-sql">              precision    recall  f1-score   support
+
+       dairy       0.56      1.00      0.71         5
+        meat       1.00      0.33      0.50         3
+
+   micro avg       0.60      0.75      0.67         8
+   macro avg       0.78      0.67      0.61         8
+weighted avg       0.72      0.75      0.63         8</code></pre>
+</li>
+</ul>
+<p>Sometimes our models' predictions are not meaningful words such as dairy or meat, they can be a number or other names. To make the classification report easy to understand, we can specify the target names to be displayed in the report. </p>
+<ul>
+<li>
+<p><code class="language-python">target_names</code> parameter specifies the display names of the target classes for which you want to generate a report. For example, we can change the names of classes to be displayed as <em>Dairy Products</em>, <em>Fruit Products</em>, and <em>Meat Products.</em> Notice that the target names will be displayed in the same order as you pass them. </p>
+<pre><code class="language-python">print(
+    classification_report(
+        df["True Labels"],
+        df["Predicted Labels"],
+        target_names=["Dairy Products", "Fruit Products", "Meat Products"],
+    )
+)
+</code></pre>
+<pre><code class="language-sql">                precision    recall  f1-score   support
+
+Dairy Products       0.56      1.00      0.71         5
+Fruit Products       0.00      0.00      0.00         2
+ Meat Products       1.00      0.33      0.50         3
+
+      accuracy                           0.60        10
+     macro avg       0.52      0.44      0.40        10
+  weighted avg       0.58      0.60      0.51        10</code></pre>
+</li>
+</ul>
+<h5 id="differences-between-micro-macro-and-weighted-results">Differences between micro, macro, and weighted results</h5>
+<p>In the examples above you can see metrics precision, recall, and f1-score for each class. In addition to these metrics, at the bottom of the frame, you can see macro, weighted, and micro metrics. Let's understand the differences between them with our last examples. </p>
+<pre><code class="language-no-highlight">+----+---------------+--------------------+
+|    | True Labels   | Predicted Labels   |
+|----+---------------+--------------------|
+|  0 | dairy         | dairy              |
+|  1 | fruits        | dairy              |
+|  2 | dairy         | dairy              |
+|  3 | dairy         | dairy              |
+|  4 | meat          | dairy              |
+|  5 | dairy         | dairy              |
+|  6 | dairy         | dairy              |
+|  7 | meat          | dairy              |
+|  8 | fruits        | dairy              |
+|  9 | meat          | meat               |
++----+---------------+--------------------+</code></pre>
+<pre><code class="language-sql">              precision    recall  f1-score   support
+
+       dairy       0.56      1.00      0.71         5
+        meat       1.00      0.33      0.50         3
+
+   micro avg       0.60      0.75      0.67         8
+   macro avg       0.78      0.67      0.61         8
+weighted avg       0.72      0.75      0.63         8</code></pre>
+<ul>
+<li>
+<p>Macro-averaging is calculated by averaging the metric (precision, recall, and F1<em>)</em> across all classes, regardless of class imbalance. Each class is given equal weight in the calculation of the metric.<br/>
+<span class="math-tex">\[\text{macro\_metric} = \frac{\text{metric\_class}_1 + \cdots + \text{metric\_class}_N}{N}\]</span>In our example, the macro-averaged precision is calculated as follows: <br/>
+<span class="math-tex">\[\text{macro\_precision} = \frac{\text{0.56} + \text{1.0} }{2} = 0.78 \]</span></p>
+</li>
+<li>
+<p>The micro-averaged metric is calculated by computing the overall metric based on the aggregate of true positives, false positives, and false negatives over all classes. For example, to calculate the micro precision, we need to first calculate true positive and false positive values <span class="math-tex">\[\text{micro\_precision} = \frac{\text{TP\_class1} + \cdots + \text{TP\_classN}}{\text{TP\_class1} + \cdots + \text{TP\_classN} + \text{FP\_class1} + \cdots + \text{FP\_classN}}\]</span></p>
+<p>Then, the micro precision on our example dataset will look like this:</p>
+<p style="text-align: center;"><span class="math-tex">\[\text{micro\_precision} = \frac{\text{TP\_dairy} + \text{TP\_meat}}{\text{TP\_dairy} + \text{TP\_meat} + \text{FP\_meat} + \text{FP\_dairy}} = \frac{5 + 1}{5 + 1 + 0 + 4} = 0.6\]</span></p>
+</li>
+<li>
+<p>  Weighted metric is a variant of macro-averaged metric that takes into account the imbalance in the class distribution.<br/>
+<span class="math-tex">\[\text{weighted metric} = \frac{\text{metric\_class1} \times \text{w\_class1} + \cdots + \text{metric\_classN} \times \text{w\_classN}}{\text{w\_class1} + \cdots + \text{w\_classN}}\]</span>By default, the weights parameter is calculated according to the support distribution. For instance, in our example the number of instances of dairy is 5, and the number of instances of meat is 3.<br/>
+<span class="math-tex">\[\text{weighted\_precision} = \frac{\text{Precision\_dairy} \times\text{Weight\_dairy} +\text{Precision\_meat} \times \text{Weight\_meat}}{\text{Weight\_dairy} + \text{Weight\_meat}} = 0.72\]</span></p>
+</li>
+</ul>
+<p>Notice, that micro average is only shown for multi-label or multi-class with a subset of classes, because it corresponds to accuracy otherwise and would be the same for all metrics. In total, it is recommended to pay more attention to weighed and micro metrics in case of an imbalanced dataset as they take into account the number of instances of each class. </p>
+<h5 id="save-the-report-to-a-file">Save the report to a file</h5>
+<p>Usually, you create a script of training and validation for your model, to save a classification report within one experiment it is recommended to save it in a txt file. To do this specify the <code class="language-python">file</code> parameter in<code class="language-python">print()</code>:</p>
+<pre><code class="language-python">with open('your_file.txt', 'w+') as f:
+  print(classification_report(df['True Labels'], df['Predicted Labels']), file=f)</code></pre>
+<h5 id="differences-from-precision_recall_fscore_support">Differences from precision_recall_fscore_support</h5>
+<p>Although the classification report is a very convenient way of getting model performance, sometimes we want to gather a specific metric of the report. To do so you can set <code class="language-python">output_dict=True</code> in <code class="language-python">classification_report()</code> and get the following results: </p>
+<details><summary>Output</summary>
+<pre><code class="language-json">{
+   "dairy":{
+      "precision":0.5555555555555556,
+      "recall":1.0,
+      "f1-score":0.7142857142857143,
+      "support":5
+   },
+   "fruits":{
+      "precision":0.0,
+      "recall":0.0,
+      "f1-score":0.0,
+      "support":2
+   },
+   "meat":{
+      "precision":1.0,
+      "recall":0.3333333333333333,
+      "f1-score":0.5,
+      "support":3
+   },
+   "accuracy":0.6,
+   "macro avg":{
+      "precision":0.5185185185185185,
+      "recall":0.4444444444444444,
+      "f1-score":0.4047619047619048,
+      "support":10
+   },
+   "weighted avg":{
+      "precision":0.5777777777777777,
+      "recall":0.6,
+      "f1-score":0.5071428571428571,
+      "support":10
+   }
+}</code></pre>
+<p>However, you can also use <code class="language-python">.precision_recall_fscore_support</code>function which return precision, recall, f1_score results for each class. </p>
+</details>
+<pre><code class="language-python">from sklearn.metrics import precision_recall_fscore_support
+
+precision_scores, recall_scores, f1_scores, supports = precision_recall_fscore_support(
+    df["True Labels"], df["Predicted Labels"]
+)
+
+</code></pre>
+<p><code class="language-python">classification_report()</code>  is useful when you want a quick and easy-to-read summary of the performance of a classifier. </p>
+<p><code class="language-python">precision_recall_fscore_support()</code>  is more suitable when you need to access the precision, recall, F1-score, and support for each class separately and manipulate them programmatically for further calculations or visualization. </p>
+<h5 id="conclusion">Conclusion</h5>
+<p>Overall, in this topic, we have learned how to create a classification report of a model and customize it according to classes and labels. In addition, we have analyzed the output average metrics of the report and their differences. </p>
+</div>
